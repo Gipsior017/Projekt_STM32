@@ -1,0 +1,7 @@
+../Core/Src/main.c:64:6:uruchom_silnik_M2_forward	1
+../Core/Src/main.c:78:5:main	1
+../Core/Src/main.c:129:6:SystemClock_Config	4
+../Core/Src/main.c:177:13:MX_TIM3_Init	4
+../Core/Src/main.c:226:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:261:13:MX_GPIO_Init	1
+../Core/Src/main.c:303:6:Error_Handler	1
