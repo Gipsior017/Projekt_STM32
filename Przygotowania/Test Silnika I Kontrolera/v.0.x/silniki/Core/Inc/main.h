@@ -63,18 +63,16 @@ void Error_Handler(void);
 #define Led_GPIO_Port GPIOA
 #define DR_latch_Pin GPIO_PIN_6
 #define DR_latch_GPIO_Port GPIOA
-#define EN1_Pin GPIO_PIN_7
-#define EN1_GPIO_Port GPIOA
-#define EN3_Pin GPIO_PIN_10
-#define EN3_GPIO_Port GPIOB
-#define DR_en_Pin GPIO_PIN_8
-#define DR_en_GPIO_Port GPIOA
+#define EN3_Pin GPIO_PIN_7
+#define EN3_GPIO_Port GPIOA
+#define EN2_Pin GPIO_PIN_10
+#define EN2_GPIO_Port GPIOB
 #define DR_ser_Pin GPIO_PIN_9
 #define DR_ser_GPIO_Port GPIOA
-#define EN2_Pin GPIO_PIN_3
-#define EN2_GPIO_Port GPIOB
-#define EN4_Pin GPIO_PIN_4
+#define EN4_Pin GPIO_PIN_3
 #define EN4_GPIO_Port GPIOB
+#define EN1_Pin GPIO_PIN_4
+#define EN1_GPIO_Port GPIOB
 #define DR_clk_Pin GPIO_PIN_5
 #define DR_clk_GPIO_Port GPIOB
 

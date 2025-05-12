@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stm32f3xx_it.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +53,7 @@ static void MX_TIM1_Init(void);
 /* USER CODE BEGIN PFP */
 void MotorPow(uint8_t P){
 	if(P<101 ){
-		TIM1->CCR1 = 100-P; //Red
+		TIM1->CCR1 = 100-P;
 
 	}
 }
@@ -123,30 +123,35 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
 
-  HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, 0);
-  HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, 0);
-  HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, 0);
-  HAL_GPIO_WritePin(EN4_GPIO_Port, EN4_Pin, 0);
-
   HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 0);
   ustawKier(0x00);
   HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 1);
 
-  MotorPow(90);
+  MotorPow(80);
 
   HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, 1);
   HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, 1);
   HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, 1);
   HAL_GPIO_WritePin(EN4_GPIO_Port, EN4_Pin, 1);
 
+
 uint8_t sekwencja[6] = {0xE4, 0x1B, 0xA9, 0x56, 0x9C, 0x63};
+uint8_t stan=0;
   while (1)
   {
-	  for(int i = 0; i<6; i++){
+	  if(stan<3){
+		  for(int i=0; i<6; i++){
+			  HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 0);
+			  ustawKier(sekwencja[i]);
+			  HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 1);
+			  HAL_Delay(2500);
+		  }
+		  stan++;
+	  }else{
 		  HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 0);
-		  ustawKier(sekwencja[i]);
+		  ustawKier(0x00);
 		  HAL_GPIO_WritePin(DR_latch_GPIO_Port, DR_latch_Pin, 1);
-		  HAL_Delay(2500);
+
 	  }
 
     /* USER CODE END WHILE */
@@ -220,9 +225,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 8;
+  htim1.Init.Prescaler = 4;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 100;
+  htim1.Init.Period = 65535;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -235,7 +240,7 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
+  if (HAL_TIM_OC_Init(&htim1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -246,14 +251,14 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.OCMode = TIM_OCMODE_TIMING;
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  if (HAL_TIM_OC_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -296,20 +301,20 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, Led_Pin|DR_latch_Pin|EN1_Pin|DR_ser_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, Led_Pin|DR_latch_Pin|EN3_Pin|DR_ser_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, EN3_Pin|EN2_Pin|EN4_Pin|DR_clk_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, EN2_Pin|EN4_Pin|EN1_Pin|DR_clk_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : Led_Pin DR_latch_Pin EN1_Pin DR_ser_Pin */
-  GPIO_InitStruct.Pin = Led_Pin|DR_latch_Pin|EN1_Pin|DR_ser_Pin;
+  /*Configure GPIO pins : Led_Pin DR_latch_Pin EN3_Pin DR_ser_Pin */
+  GPIO_InitStruct.Pin = Led_Pin|DR_latch_Pin|EN3_Pin|DR_ser_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : EN3_Pin EN2_Pin EN4_Pin DR_clk_Pin */
-  GPIO_InitStruct.Pin = EN3_Pin|EN2_Pin|EN4_Pin|DR_clk_Pin;
+  /*Configure GPIO pins : EN2_Pin EN4_Pin EN1_Pin DR_clk_Pin */
+  GPIO_InitStruct.Pin = EN2_Pin|EN4_Pin|EN1_Pin|DR_clk_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
